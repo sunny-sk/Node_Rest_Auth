@@ -9,22 +9,23 @@ const genres = [
   },
   {
     id: 2,
-    name: "course1"
+    name: "course2"
   },
   {
     id: 3,
-    name: "course1"
+    name: "course3"
   }
 ];
 
 router.get("/", (req, res, next) => {
-  res.send(genres);
+  res.status(200).send(genres);
 });
 
 router.get("/:id", (req, res, next) => {
   const genre = genres.find(genre => genre.id === parseInt(req.params.id));
   if (!genre) return res.status(404).send("not found");
-  res.send(genre);
+
+  res.status(200).send(genre);
 });
 
 router.post("/", (req, res, next) => {

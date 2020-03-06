@@ -3,13 +3,14 @@ const app = express();
 require("colors");
 require("dotenv").config();
 const morgan = require("morgan");
-
 const helmet = require("helmet");
 const mongoose = require("mongoose");
+app.use(morgan("tiny"));
 
 if (process.env.NODE_ENV === "development") {
-  app.use(morgan("dev"));
   console.log("in development mode");
+} else {
+  console.log("production mode");
 }
 app.use(helmet());
 app.use(express.json());
