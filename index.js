@@ -20,9 +20,19 @@ mongoose.set("useFindAndModify", false);
 mongoose.set("useCreateIndex", true);
 mongoose.set("useUnifiedTopology", true);
 
+// routes
 const courses = require("./routes/genres");
 app.use("/api/genres/", courses);
 
+//local server
 app.listen(process.env.PORT, () => {
   console.log(`Server started at ${process.env.PORT}`);
+  mongoose
+    .connect("mongodb://localhost/videly")
+    .then(res => {
+      console.log("connected to mongoDB".cyan);
+    })
+    .catch(err => {
+      console.log("Mongodb Error".red, err.message.red);
+    });
 });
