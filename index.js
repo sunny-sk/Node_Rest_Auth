@@ -23,7 +23,9 @@ mongoose.set("useUnifiedTopology", true);
 
 // routes
 const courses = require("./routes/genres");
+const customers = require("./routes/customers");
 app.use("/api/genres/", courses);
+app.use("/api/customers/", customers);
 
 //local server
 app.listen(process.env.PORT, () => {
