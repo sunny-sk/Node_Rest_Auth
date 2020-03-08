@@ -14,7 +14,7 @@ router.get("/", async (req, res, next) => {
 });
 router.get("/:id", async (req, res, next) => {
   try {
-    const movie = await Movie.findById();
+    const movie = await Movie.findById(findById);
     if (!movie)
       return res.status(404).send({ success: false, result: "not found" });
     res.status(200).send({ success: true, movie });
@@ -34,7 +34,7 @@ router.post("/", async (req, res, next) => {
     const genre = await Genre.findById(req.body.genreId);
     if (!genre)
       return res.status(404).send({ success: false, result: "not found" });
-    let movie = new Movie({
+    const movie = new Movie({
       title: req.body.title,
       genre: {
         _id: genre._id,
@@ -43,7 +43,7 @@ router.post("/", async (req, res, next) => {
       numberInStock: req.body.numberInStock,
       dailyRentalRate: req.body.dailyRentalRate
     });
-    movie = await movie.save();
+    await movie.save();
     res.status(201).send({ success: true, movie });
   } catch (error) {
     console.log(error);
@@ -53,7 +53,7 @@ router.post("/", async (req, res, next) => {
 router.put("/:id", async (req, res, next) => {
   try {
     const { error } = validateMovie(req.body);
-    if (error) return res.status(400).send(error.details);
+    if (error) return res.status(400).send(error.details[0].message);
     const genre = await Genre.findById(req.body.genreId);
     if (!genre)
       return res
