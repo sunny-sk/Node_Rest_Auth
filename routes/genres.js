@@ -1,20 +1,7 @@
 const express = require("express");
 const router = express.Router();
-const Joi = require("@hapi/joi");
 
-const mongoose = require("mongoose");
-
-const genreSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    trim: true,
-    required: true,
-    min: 5,
-    max: 50
-  }
-});
-
-const Genre = new mongoose.model("Genre", genreSchema);
+const { Genre, validateGenre } = require("../model/genre.model");
 
 router.get("/", async (req, res, next) => {
   try {
@@ -79,14 +66,3 @@ router.delete("/:id", async (req, res, next) => {
 });
 
 module.exports = router;
-
-function validateGenre(genre) {
-  const scheme = Joi.object({
-    name: Joi.string()
-      .min(5)
-      .max(50)
-      .trim()
-      .required()
-  });
-  return scheme.validate(genre);
-}

@@ -1,29 +1,7 @@
 const express = require("express");
 const router = express.Router();
-const Joi = require("@hapi/joi");
-const mongoose = require("mongoose");
 
-const customerSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    trim: true,
-    required: true,
-    minlength: 5,
-    maxlength: 50
-  },
-  isGold: {
-    type: Boolean,
-    default: false
-  },
-  phone: {
-    type: String,
-    required: true,
-    minlength: 10,
-    maxlength: 10
-  }
-});
-
-const Customer = new mongoose.model("Customer", customerSchema);
+const { Customer, validateCustomer } = require("../model/customer.model");
 
 router.get("/", async (req, res, next) => {
   try {
@@ -100,21 +78,5 @@ router.delete("/:id", async (req, res, next) => {
     res.status(200).send({ success: true, customer });
   } catch (error) {}
 });
-
-function validateCustomer(customer) {
-  const scheme = Joi.object({
-    name: Joi.string()
-      .min(5)
-      .max(50)
-      .trim()
-      .required(),
-    phone: Joi.string()
-      .required()
-      .min(10)
-      .max(10),
-    isGold: Joi.boolean()
-  });
-  return scheme.validate(customer);
-}
 
 module.exports = router;
