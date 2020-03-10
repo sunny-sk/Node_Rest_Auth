@@ -1,14 +1,40 @@
 const mongoose = require("mongoose");
-const Joi = require("@hapi/joi");
+
 const jwt = require("jsonwebtoken");
 
-const userSchema = new mongoose.Schema({
-  name: {
+const userProfileDataSchema = new mongoose.Schema({
+  firstName: {
     type: String,
     trim: true,
-    required: true,
     minlength: 5,
     maxlength: 50
+  },
+  lastName: {
+    type: String,
+    trim: true,
+    minlength: 5,
+    maxlength: 50
+  },
+  bio: {
+    type: String,
+    minlength: 5,
+    maxlength: 255,
+    trim: true
+  }
+});
+
+const userSchema = new mongoose.Schema({
+  userName: {
+    type: String,
+    trim: true,
+    unique: true,
+    required: true,
+    minlength: 3,
+    maxlength: 50
+  },
+  userData: {
+    default: null,
+    type: Object
   },
   email: {
     type: String,
@@ -29,7 +55,11 @@ const userSchema = new mongoose.Schema({
     type: Date,
     default: Date.now
   },
-  isAdmin: Boolean
+  isAdmin: Boolean,
+  emailVerified: {
+    type: Boolean,
+    default: false
+  }
 });
 
 userSchema.methods.generateAuthToken = function() {
@@ -41,25 +71,5 @@ userSchema.methods.generateAuthToken = function() {
 };
 const User = new mongoose.model("User", userSchema);
 
-function validateUser(user) {
-  const scheme = Joi.object({
-    name: Joi.string()
-      .min(5)
-      .max(50)
-      .trim()
-      .required(),
-    email: Joi.string()
-      .min(5)
-      .max(255)
-      .required()
-      .email(),
-    password: Joi.string()
-      .min(5)
-      .max(255)
-      .required()
-  });
-  return scheme.validate(user);
-}
-
-module.exports.validateUser = validateUser;
 module.exports.User = User;
+module.exports.userProfileDataSchema = userProfileDataSchema;

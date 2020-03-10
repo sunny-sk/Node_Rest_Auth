@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
-const { Movie, validateMovie } = require("../model/movie.model");
+const { Movie } = require("../model/movie.model");
+const { validateMovie } = require("../validations/movie.validation");
 const { Genre } = require("../model/genre.model");
 
 router.get("/", async (req, res, next) => {
