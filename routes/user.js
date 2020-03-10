@@ -7,7 +7,7 @@ const auth = require("../middleware/auth");
 
 router.get("/me", auth, async (req, res, next) => {
   const user = await User.findById(req.user._id).select("-password");
-  res.send(user);
+  res.send({ success: true, code: 200, user });
 });
 
 router.post("/", async (req, res, next) => {
@@ -16,13 +16,17 @@ router.post("/", async (req, res, next) => {
     if (error)
       return res
         .status(400)
-        .send({ success: false, message: error.details[0].message });
+        .send({ success: false, code: 400, message: error.details[0].message });
 
     let user = await User.findOne({ email: req.body.email });
     if (user)
       return res
         .status(400)
-        .send({ success: false, message: "user already registered" });
+        .send({
+          success: false,
+          code: 400,
+          message: "user already registered"
+        });
 
     user = new User(_.pick(req.body, ["name", "email", "password"]));
 

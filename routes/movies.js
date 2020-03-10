@@ -1,6 +1,5 @@
 const express = require("express");
 const router = express.Router();
-const mongoose = require("mongoose");
 const { Movie, validateMovie } = require("../model/movie.model");
 const { Genre } = require("../model/genre.model");
 

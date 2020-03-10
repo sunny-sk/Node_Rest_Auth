@@ -16,6 +16,7 @@ router.get("/", async (req, res, next) => {
     res.status(200).send(rentals);
   } catch (error) {}
 });
+
 router.get("/:id", async (req, res, next) => {
   try {
     const rentals = await Rental.findById(req.params.id)

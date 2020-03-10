@@ -1,31 +1,30 @@
 const express = require("express");
 const router = express.Router();
-
 const { Customer, validateCustomer } = require("../model/customer.model");
+const asyncMiddleware = require("../middleware/async");
 
-router.get("/", async (req, res, next) => {
-  try {
+router.get(
+  "/",
+  asyncMiddleware(async (req, res, next) => {
     const customer = await Customer.find().sort("name");
     res.status(200).send({ success: true, customer });
-  } catch (error) {
-    console.log(error);
-  }
-});
+  })
+);
 
-router.get("/:id", async (req, res, next) => {
-  try {
+router.get(
+  "/:id",
+  asyncMiddleware(async (req, res, next) => {
     const customer = await Customer.findById(req.params.id);
     if (!customer) {
       return res.status(404).send({ success: false, result: "not found" });
     }
     res.status(200).send({ success: true, customer });
-  } catch (error) {
-    console.log(error);
-  }
-});
+  })
+);
 
-router.post("/", async (req, res, next) => {
-  try {
+router.post(
+  "/",
+  asyncMiddleware(async (req, res, next) => {
     const { error } = validateCustomer(req.body);
     if (error) {
       return res
@@ -39,14 +38,13 @@ router.post("/", async (req, res, next) => {
       phone: req.body.phone
     });
     customer = await customer.save();
-    res.status(201).send({ success: true, customer });
-  } catch (error) {
-    console.log(error);
-  }
-});
+    res.status(201).send({ success: true, code: 201, customer });
+  })
+);
 
-router.put("/:id", async (req, res, next) => {
-  try {
+router.put(
+  "/:id",
+  asyncMiddleware(async (req, res, next) => {
     const { error } = validateCustomer(req.body);
     if (error) return res.status(400).send(error.details);
 
@@ -62,21 +60,24 @@ router.put("/:id", async (req, res, next) => {
       }
     );
     if (!customer)
-      return res.status(404).send({ success: false, result: "not found" });
-    res.status(200).send({ success: true, customer });
-  } catch (error) {
-    console.log(error);
-  }
-});
+      return res
+        .status(404)
+        .send({ success: false, code: 404, result: "not found" });
+    res.status(200).send({ success: true, code: 200, customer });
+  })
+);
 
-router.delete("/:id", async (req, res, next) => {
-  try {
+router.delete(
+  "/:id",
+  asyncMiddleware(async (req, res, next) => {
     const customer = await Customer.findByIdAndRemove(req.params.id);
     if (!customer) {
-      return res.status(404).send({ success: false, result: "not found" });
+      return res
+        .status(404)
+        .send({ success: false, code: 404, result: "not found" });
     }
-    res.status(200).send({ success: true, customer });
-  } catch (error) {}
-});
+    res.status(200).send({ success: true, code: 200, customer });
+  })
+);
 
 module.exports = router;

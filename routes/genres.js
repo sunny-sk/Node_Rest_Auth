@@ -4,12 +4,15 @@ const auth = require("../middleware/auth");
 const admin = require("../middleware/admin");
 const { Genre, validateGenre } = require("../model/genre.model");
 const asyncMiddleware = require("../middleware/async");
+const { res404 } = require("../utils/response");
 
 router.get(
   "/",
   asyncMiddleware(async (req, res) => {
     const genres = await Genre.find().sort("name");
-    res.status(200).send({ success: true, genres });
+    res
+      .status(200)
+      .send({ success: true, code: 200, count: genres.length, genres });
   })
 );
 
@@ -17,23 +20,24 @@ router.get(
   "/:id",
   asyncMiddleware(async (req, res) => {
     const genre = await Genre.findById(req.params.id);
-    if (!genre)
-      return res.status(404).send({ success: false, result: "not found" });
-    res.status(200).send(genre);
+    if (!genre) return res404(res);
+
+    res.status(200).send({ success: true, code: 200, genre });
   })
 );
 
 router.post(
   "/",
-  asyncMiddleware(auth, async (req, res) => {
+  auth,
+  asyncMiddleware(async (req, res) => {
     const { error } = validateGenre(req.body);
     if (error)
       return res
         .status(400)
-        .send({ success: false, error: error.details[0].message });
+        .send({ success: false, code: 400, error: error.details[0].message });
     let genre = new Genre({ name: req.body.name });
     genre = await genre.save();
-    res.status(201).send({ success: true, genre });
+    res.status(201).send({ success: true, code: 200, genre });
   })
 );
 
@@ -52,9 +56,8 @@ router.put(
         new: true
       }
     );
-    if (!genre)
-      return res.status(404).send({ success: false, result: "not found" });
-    res.status(200).send({ success: true, genre });
+    if (!genre) return res404(res);
+    res.status(200).send({ success: true, code: 200, genre });
   })
 );
 
@@ -63,9 +66,8 @@ router.delete(
   [auth, admin],
   asyncMiddleware(async (req, res, next) => {
     const genre = await Genre.findByIdAndRemove(req.params.id);
-    if (!genre)
-      return res.status(404).send({ success: false, result: "not found" });
-    res.status(200).send({ success: true, genre });
+    if (!genre) return res404(res);
+    res.status(200).send({ success: true, code: 200, genre });
   })
 );
 
