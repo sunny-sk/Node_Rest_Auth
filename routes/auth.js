@@ -4,7 +4,6 @@ const _ = require("lodash");
 const bcrypt = require("bcrypt");
 const { User } = require("../model/user.model");
 const Joi = require("@hapi/joi");
-const jwt = require("jsonwebtoken");
 
 router.post("/", async (req, res, next) => {
   try {
@@ -29,8 +28,7 @@ router.post("/", async (req, res, next) => {
         .status(400)
         .send({ success: false, message: "Invalid email or password" });
 
-    const token = jwt.sign({ _id: user._id }, process.env.PRIVATE_KEY);
-
+    const token = user.generateAuthToken();
     res.status(200).send({ success: true, message: "loggedIn", token: token });
   } catch (error) {
     console.log(error);

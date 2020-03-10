@@ -3,7 +3,13 @@ const router = express.Router();
 const _ = require("lodash");
 const bcrypt = require("bcrypt");
 const { User, validateUser } = require("../model/user.model");
-const jwt = require("jsonwebtoken");
+const auth = require("../middleware/auth");
+
+router.get("/me", auth, async (req, res, next) => {
+  const user = await User.findById(req.user._id).select("-password");
+  res.send(user);
+});
+
 router.post("/", async (req, res, next) => {
   try {
     const { error } = validateUser(req.body);
@@ -24,7 +30,8 @@ router.post("/", async (req, res, next) => {
     user.password = await bcrypt.hash(user.password, salt);
 
     await user.save();
-    const token = jwt.sign({ _id: user._id }, process.env.PRIVATE_KEY);
+
+    const token = user.generateAuthToken();
 
     res
       .status(201)
@@ -33,6 +40,8 @@ router.post("/", async (req, res, next) => {
         success: true,
         userData: _.pick(user, ["name", "email", "registerDate"])
       });
-  } catch (error) {}
+  } catch (error) {
+    console.log(error);
+  }
 });
 module.exports = router;

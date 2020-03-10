@@ -1,30 +1,31 @@
 const express = require("express");
 const router = express.Router();
-
+const auth = require("../middleware/auth");
+const admin = require("../middleware/admin");
 const { Genre, validateGenre } = require("../model/genre.model");
+const asyncMiddleware = require("../middleware/async");
 
-router.get("/", async (req, res, next) => {
-  try {
+router.get(
+  "/",
+  asyncMiddleware(async (req, res) => {
     const genres = await Genre.find().sort("name");
     res.status(200).send({ success: true, genres });
-  } catch (error) {
-    console.log(error);
-  }
-});
+  })
+);
 
-router.get("/:id", async (req, res, next) => {
-  try {
+router.get(
+  "/:id",
+  asyncMiddleware(async (req, res) => {
     const genre = await Genre.findById(req.params.id);
     if (!genre)
       return res.status(404).send({ success: false, result: "not found" });
     res.status(200).send(genre);
-  } catch (error) {
-    console.log(error);
-  }
-});
+  })
+);
 
-router.post("/", async (req, res, next) => {
-  try {
+router.post(
+  "/",
+  asyncMiddleware(auth, async (req, res) => {
     const { error } = validateGenre(req.body);
     if (error)
       return res
@@ -33,11 +34,12 @@ router.post("/", async (req, res, next) => {
     let genre = new Genre({ name: req.body.name });
     genre = await genre.save();
     res.status(201).send({ success: true, genre });
-  } catch (error) {}
-});
+  })
+);
 
-router.put("/:id", async (req, res, next) => {
-  try {
+router.put(
+  "/:id",
+  asyncMiddleware(async (req, res) => {
     const { error } = validateGenre(req.body);
     if (error) return res.status(400).send(error.details);
 
@@ -53,16 +55,18 @@ router.put("/:id", async (req, res, next) => {
     if (!genre)
       return res.status(404).send({ success: false, result: "not found" });
     res.status(200).send({ success: true, genre });
-  } catch (error) {
-    console.log(error);
-  }
-});
+  })
+);
 
-router.delete("/:id", async (req, res, next) => {
-  const genre = await Genre.findByIdAndRemove(req.params.id);
-  if (!genre)
-    return res.status(404).send({ success: false, result: "not found" });
-  res.status(200).send({ success: true, genre });
-});
+router.delete(
+  "/:id",
+  [auth, admin],
+  asyncMiddleware(async (req, res, next) => {
+    const genre = await Genre.findByIdAndRemove(req.params.id);
+    if (!genre)
+      return res.status(404).send({ success: false, result: "not found" });
+    res.status(200).send({ success: true, genre });
+  })
+);
 
 module.exports = router;

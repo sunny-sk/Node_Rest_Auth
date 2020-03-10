@@ -22,6 +22,8 @@
     "lodash": "^4.17.15",
     "mongoose": "^5.9.3",
     "morgan": "^1.9.1",
-    "redis": "^3.0.2"
+    "redis": "^3.0.2",
+    "winston": "^3.2.1",
+    "winston-mongodb": "^5.0.1"
   }
 }
