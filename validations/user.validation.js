@@ -1,14 +1,9 @@
 const Joi = require("@hapi/joi");
 
-function validateUser(user) {
+function validateRegisterUser(user) {
   const scheme = Joi.object({
     userName: Joi.string()
       .min(3)
-      .max(50)
-      .trim()
-      .required(),
-    name: Joi.string()
-      .min(5)
       .max(50)
       .trim()
       .required(),
@@ -64,9 +59,8 @@ function validateResetPassword(password) {
     oldPassword: Joi.string()
       .min(5)
       .max(255)
-      .required()
-      .email(),
-    newPasword: Joi.string()
+      .required(),
+    newPassword: Joi.string()
       .min(5)
       .max(255)
       .required()
@@ -89,7 +83,7 @@ function validateLogin(user) {
   return scheme.validate(user);
 }
 
-module.exports.validateUser = validateUser;
+module.exports.validateRegisterUser = validateRegisterUser;
 module.exports.validateUpdateProfile = validateUpdateProfile;
 module.exports.validateCheckUserExist = validateCheckUserExist;
 module.exports.validateResetPassword = validateResetPassword;

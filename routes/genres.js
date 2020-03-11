@@ -29,7 +29,7 @@ router.get(
 
 router.post(
   "/",
-  auth,
+  [auth, admin],
   asyncMiddleware(async (req, res) => {
     const { error } = validateGenre(req.body);
     if (error)
@@ -44,6 +44,7 @@ router.post(
 
 router.put(
   "/:id",
+  [auth, admin],
   asyncMiddleware(async (req, res) => {
     const { error } = validateGenre(req.body);
     if (error) return res.status(400).send(error.details);

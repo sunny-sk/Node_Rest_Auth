@@ -5,7 +5,7 @@ const bcrypt = require("bcrypt");
 const { User } = require("../model/user.model");
 const {
   validateCheckUserExist,
-  validateUser
+  validateRegisterUser
 } = require("../validations/user.validation");
 const auth = require("../middleware/auth");
 
@@ -13,10 +13,9 @@ router.get("/me", auth, async (req, res, next) => {
   const user = await User.findById(req.user._id).select("-password");
   res.send({ success: true, code: 200, user });
 });
-
 router.post("/register", async (req, res, next) => {
   try {
-    const { error } = validateUser(req.body);
+    const { error } = validateRegisterUser(req.body);
     if (error)
       return res
         .status(400)
@@ -38,28 +37,29 @@ router.post("/register", async (req, res, next) => {
         message: "username already taken"
       });
 
-    user = new User(
-      _.pick(req.body, ["name", "email", "password", "userName"])
-    );
+    user = new User(_.pick(req.body, ["email", "password", "userName"]));
 
     const salt = await bcrypt.genSalt(10);
     user.password = await bcrypt.hash(user.password, salt);
 
-    await user.save();
-
     const token = user.generateAuthToken();
-    console.log(user);
+
+    user.token = token;
+    await user.save();
     res
       .status(201)
       .header("x-auth-token", token)
       .send({
         success: true,
+        code: 201,
         user: _.pick(user, [
           "_id",
           "email",
           "userName",
           "userData",
-          "registerDate"
+          "registerDate",
+          "token",
+          "isAdmin"
         ])
       });
   } catch (error) {
@@ -73,6 +73,7 @@ router.post("/checkUserName", async (req, res, next) => {
     return res
       .status(400)
       .send({ success: false, code: 400, message: error.details[0].message });
+
   let user = await User.findOne({ userName: req.body.userName });
   if (user)
     return res.status(400).send({

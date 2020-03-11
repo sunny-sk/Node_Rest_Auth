@@ -1,13 +1,13 @@
 const mongoose = require("mongoose");
 
-mongoose
-  .connect("mongodb://localhost/playground")
-  .then(params => {
-    console.log("connected");
-  })
-  .catch(() => {
-    console.log("not connected");
-  });
+// mongoose
+//   .connect("mongodb://localhost/playground")
+//   .then(params => {
+//     console.log("connected");
+//   })
+//   .catch(() => {
+//     console.log("not connected");
+//   });
 
 const Author = mongoose.model(
   "Author",
@@ -55,6 +55,37 @@ async function listCourses() {
   } catch (error) {}
 }
 
-// createAuthor("sunny", "myBio", "myWebsite");
-// createCourse("node course", "5e64bff8086c512c82990394");
-listCourses();
+const x = new Date("2020-03-11T10:57:39.099+00:00");
+
+const h = new Intl.DateTimeFormat("en", {
+  hour: "numeric"
+}).format(x);
+const m = new Intl.DateTimeFormat("en", {
+  minute: "numeric"
+}).format(x);
+const s = new Intl.DateTimeFormat("en", {
+  second: "numeric"
+}).format(x);
+
+const t1 = parseInt(h.split(" ")[0]) * 60 * 60 + parseInt(m) * 60 + parseInt(s);
+
+setInterval(() => {
+  const p = new Date();
+  const h1 = new Intl.DateTimeFormat("en", {
+    hour: "numeric"
+  }).format(p);
+  const m1 = new Intl.DateTimeFormat("en", {
+    minute: "numeric"
+  }).format(p);
+  const s1 = new Intl.DateTimeFormat("en", {
+    second: "numeric"
+  }).format(p);
+  const t2 =
+    parseInt(h1.split(" ")[0]) * 60 * 60 + parseInt(m1) * 60 + parseInt(s1);
+
+  if (Math.abs(t1 - t2) > 60) {
+    console.log("not valid");
+  } else {
+    console.log("valid");
+  }
+}, 1000);
